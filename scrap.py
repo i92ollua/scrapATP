@@ -94,7 +94,6 @@ def get_statist_match(url,torneo, fecha_torneo):
             winner = transform_text(names[0].text).strip()+" "+transform_text(last_names[0].text).strip()
         else:
             winner = transform_text(names[1].text).strip()+" "+transform_text(last_names[1].text).strip()
-    #falta sacar el ganador
     return [player1, player2, winner, torneo,fecha_torneo]
 
 def write_xls(data):
