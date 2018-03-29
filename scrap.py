@@ -149,5 +149,4 @@ def write_xls(data):
             sh.write(i, 2*len(data[i-1][0])+1, data[i-1][3])
             sh.write(i, 2*len(data[i-1][0])+2, data[i-1][4][0])
             sh.write(i, 2*len(data[i-1][0])+3, data[i-1][4][1])
-    book.save("ATPdata.xls")
-    print "Save it!"
+    book.save("ATPstatics.xls")
