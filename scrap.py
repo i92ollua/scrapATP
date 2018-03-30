@@ -67,6 +67,8 @@ def transform_text(text):
         text_transformed = text_transformed.replace(u'\u2019', "'")
     if text_transformed.find(u'\xf4') != -1:
         text_transformed = text_transformed.replace(u'\xf4', "o")
+    if text_transformed.find(u'\xfc') != -1:
+        text_transformed = text_transformed.replace(u'\xfc', "u")
     return text_transformed
 
 def get_url_matches(html):
@@ -80,29 +82,32 @@ def get_url_matches(html):
 def get_statist_match(url,tournament, tournament_date, surface):
     player1 = []
     player2 = []
-    response = urllib2.urlopen(url)
-    bs = BeautifulSoup(response, 'html.parser')
-    names = bs.findAll('span', class_="first-name")
-    last_names = bs.findAll('span', class_="last-name")
-    if len(names)!=0:
-        player1.append((transform_text(names[0].text).strip())+" "+transform_text(last_names[0].text).strip())
-        player2.append(transform_text(names[1].text).strip()+" "+transform_text(last_names[1].text).strip())
-        staticts1 = bs.findAll('td', class_ = 'match-stats-number-left')
-        staticts2 = bs.findAll('td', class_='match-stats-number-right')
-        for element1, element2 in zip(staticts1, staticts2):
-            aux1 = transform_text(element1.text).strip()
-            aux2 = transform_text(element2.text).strip()
-            if aux1.find("%") != -1:
-                aux1 = aux1.split("%")[0]
-                aux2 = aux2.split("%")[0]
-            player1.append(aux1)
-            player2.append(aux2)
-        winner = bs.findAll('td', class_= 'won-game')
-        name = transform_text(winner[0].text).split(".")[1].strip()
-        if last_names[0].text.find(name)!=-1:
-            winner = transform_text(names[0].text).strip()+" "+transform_text(last_names[0].text).strip()
-        else:
-            winner = transform_text(names[1].text).strip()+" "+transform_text(last_names[1].text).strip()
+    try:
+        response = urllib2.urlopen(url)
+        bs = BeautifulSoup(response, 'html.parser')
+        names = bs.findAll('span', class_="first-name")
+        last_names = bs.findAll('span', class_="last-name")
+        if len(names)!=0:
+            player1.append((transform_text(names[0].text).strip())+" "+transform_text(last_names[0].text).strip())
+            player2.append(transform_text(names[1].text).strip()+" "+transform_text(last_names[1].text).strip())
+            staticts1 = bs.findAll('td', class_ = 'match-stats-number-left')
+            staticts2 = bs.findAll('td', class_='match-stats-number-right')
+            for element1, element2 in zip(staticts1, staticts2):
+                aux1 = transform_text(element1.text).strip()
+                aux2 = transform_text(element2.text).strip()
+                if aux1.find("%") != -1:
+                    aux1 = aux1.split("%")[0]
+                    aux2 = aux2.split("%")[0]
+                player1.append(aux1)
+                player2.append(aux2)
+            winner = bs.findAll('td', class_= 'won-game')
+            name = transform_text(winner[0].text).split(".")[1].strip()
+            if last_names[0].text.find(name)!=-1:
+                winner = transform_text(names[0].text).strip()+" "+transform_text(last_names[0].text).strip()
+            else:
+                winner = transform_text(names[1].text).strip()+" "+transform_text(last_names[1].text).strip()
+    except Exception as inst:
+        print "Error in URL "+ str(url) + " " + str(inst)
     return [player1, player2, winner, tournament, tournament_date, surface]
 
 def write_xls(data):
