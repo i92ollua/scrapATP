@@ -25,19 +25,18 @@ def get_tournaments(labels):
         iteration = td.next_element.next_element
         if iteration.name == 'span':
             tournament =iteration.text
-            if tournament.find(u"\u00E5") != -1:
-                tournament = tournament.replace(u"\u00E5","a")
-            if tournament.find(u'\xfa') != -1:
-                tournament = tournament.replace(u'\xfa',"u")
-            if tournament.find(u'\xb4') != -1:
-                tournament = tournament.replace(u'\xb4', "And")
-            if tournament.find(u'\u2019' ) != -1:
-                tournament = tournament.replace(u'\u2019' , "'")
-            if tournament.find(u'\xf4' ) != -1:
-                tournament = tournament.replace(u'\xf4' , "o")
             tournament = transform_text(tournament)
             tournaments.append(str(tournament))
     return tournaments
+
+def get_tournaments_surface(html):
+    surfaces = []
+    bs = BeautifulSoup(html, 'html.parser')
+    aux = bs.findAll('span', class_="item-value")
+    for i in range((len(aux))/4):
+        if transform_text(aux[2+i*4].text).strip() != "":
+            surfaces.append(transform_text(aux[2+i*4].text).strip())
+    return surfaces
 
 def get_date_tournament(html):
     start = ""
@@ -58,6 +57,16 @@ def transform_text(text):
     text_transformed = text.replace("\t", "")
     text_transformed = text_transformed.replace("\r", "")
     text_transformed = text_transformed.replace("\n", "")
+    if text_transformed.find(u"\u00E5") != -1:
+        text_transformed = text_transformed.replace(u"\u00E5", "a")
+    if text_transformed.find(u'\xfa') != -1:
+        text_transformed = text_transformed.replace(u'\xfa', "u")
+    if text_transformed.find(u'\xb4') != -1:
+        text_transformed = text_transformed.replace(u'\xb4', "And")
+    if text_transformed.find(u'\u2019') != -1:
+        text_transformed = text_transformed.replace(u'\u2019', "'")
+    if text_transformed.find(u'\xf4') != -1:
+        text_transformed = text_transformed.replace(u'\xf4', "o")
     return text_transformed
 
 def get_url_matches(html):
@@ -68,7 +77,7 @@ def get_url_matches(html):
         urls.append(str(element['href']))
     return urls
 
-def get_statist_match(url,torneo, fecha_torneo):
+def get_statist_match(url,tournament, tournament_date, surface):
     player1 = []
     player2 = []
     response = urllib2.urlopen(url)
@@ -94,7 +103,7 @@ def get_statist_match(url,torneo, fecha_torneo):
             winner = transform_text(names[0].text).strip()+" "+transform_text(last_names[0].text).strip()
         else:
             winner = transform_text(names[1].text).strip()+" "+transform_text(last_names[1].text).strip()
-    return [player1, player2, winner, torneo,fecha_torneo]
+    return [player1, player2, winner, tournament, tournament_date, surface]
 
 def write_xls(data):
     book = xlwt.Workbook(encoding="utf-8")
@@ -139,6 +148,7 @@ def write_xls(data):
             sh.write(i, 35, "Tournament")
             sh.write(i, 36, "Started date")
             sh.write(i, 37, "Ended date")
+            sh.write(i, 38, "Surface")
         else:
             for j in range(len(data[i-1][0])):
                 if i != 0:
@@ -148,4 +158,5 @@ def write_xls(data):
             sh.write(i, 2*len(data[i-1][0])+1, data[i-1][3])
             sh.write(i, 2*len(data[i-1][0])+2, data[i-1][4][0])
             sh.write(i, 2*len(data[i-1][0])+3, data[i-1][4][1])
+            sh.write(i, 2 *len(data[i-1][0])+4, data[i - 1][5])
     book.save("ATPstatics.xls")
