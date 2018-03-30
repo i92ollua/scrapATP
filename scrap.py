@@ -9,6 +9,7 @@ def download_html(url):
         html = response.read()
     except Exception as inst:
         print "Error in URL "+ str(url) + " " + str(inst)
+        return download_html(url)
     return html
 
 def lookfor_html(html,element):
@@ -86,6 +87,7 @@ def get_url_matches(html):
 def get_statist_match(url,tournament, tournament_date, surface):
     player1 = []
     player2 = []
+    winner = ""
     try:
         response = urllib2.urlopen(url)
         bs = BeautifulSoup(response, 'html.parser')
@@ -112,6 +114,7 @@ def get_statist_match(url,tournament, tournament_date, surface):
                 winner = transform_text(names[1].text).strip()+" "+transform_text(last_names[1].text).strip()
     except Exception as inst:
         print "Error in URL "+ str(url) + " " + str(inst)
+        return get_statist_match(url,tournament, tournament_date, surface)
     return [player1, player2, winner, tournament, tournament_date, surface]
 
 def write_xls(data):
