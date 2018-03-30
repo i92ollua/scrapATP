@@ -3,8 +3,12 @@ from bs4 import BeautifulSoup
 import xlwt
 
 def download_html(url):
-    response = urllib2.urlopen(url)
-    html = response.read()
+    html = ""
+    try:
+        response = urllib2.urlopen(url)
+        html = response.read()
+    except Exception as inst:
+        print "Error in URL "+ str(url) + " " + str(inst)
     return html
 
 def lookfor_html(html,element):
