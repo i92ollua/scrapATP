@@ -24,25 +24,6 @@ def get_first_part(labels):
             urls.append(str(iteration['href']))
     return urls
 
-def get_tournaments(labels):
-    tournaments = []
-    for td in labels:
-        iteration = td.next_element.next_element
-        if iteration.name == 'span':
-            tournament =iteration.text
-            tournament = transform_text(tournament)
-            tournaments.append(str(tournament))
-    return tournaments
-
-def get_tournaments_surface(html):
-    surfaces = []
-    bs = BeautifulSoup(html, 'html.parser')
-    aux = bs.findAll('span', class_="item-value")
-    for i in range((len(aux))/4):
-        if transform_text(aux[2+i*4].text).strip() != "":
-            surfaces.append(transform_text(aux[2+i*4].text).strip())
-    return surfaces
-
 def get_date_tournament(html):
     start = ""
     end = ""
@@ -57,6 +38,16 @@ def get_date_tournament(html):
         end = aux[5]+"/"+aux[4]+"/"+aux[3]
     date = [start,end]
     return date
+
+def get_tournament(html):
+    bs = BeautifulSoup(html, 'html.parser')
+    searching = bs.findAll('td', class_ = "title-content")
+    return transform_text(searching[0].contents[1].text).strip()
+
+def get_surface(html):
+    bs = BeautifulSoup(html, 'html.parser')
+    searching = bs.findAll('span', class_ = "item-value")
+    return transform_text(searching[2].text).strip()
 
 def transform_text(text):
     text_transformed = text.replace("\t", "")
