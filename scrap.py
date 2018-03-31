@@ -42,12 +42,18 @@ def get_date_tournament(html):
 def get_tournament(html):
     bs = BeautifulSoup(html, 'html.parser')
     searching = bs.findAll('td', class_ = "title-content")
-    return transform_text(searching[0].contents[1].text).strip()
+    if len(searching)!=0:
+        return transform_text(searching[0].contents[1].text).strip()
+    else:
+        return ""
 
 def get_surface(html):
     bs = BeautifulSoup(html, 'html.parser')
     searching = bs.findAll('span', class_ = "item-value")
-    return transform_text(searching[2].text).strip()
+    if len(searching)!=0:
+        return transform_text(searching[2].text).strip()
+    else:
+        return ""
 
 def transform_text(text):
     text_transformed = text.replace("\t", "")
